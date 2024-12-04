@@ -112,8 +112,8 @@ fn part1(input: &Vec<String>) -> i64 {
     rows + cols + diagonals
 }
 
-// Quite slow but works (~4s with release config, ~45s with dev config)
 fn part2(input: &Vec<String>) -> i64 {
+    let xmas = Regex::new(r"^(?:M.M.A.S.S|M.S.A.M.S|S.M.A.S.M|S.S.A.M.M)$").unwrap();
     // Iterate through all possible starting points (topleft) for xmas shape
     (0..(input.len() - 2))
         .map(|x| {
@@ -121,8 +121,6 @@ fn part2(input: &Vec<String>) -> i64 {
                 .filter(|&y| {
                     let combined: String = (y..(y + 3))
                         .fold(String::new(), |t, y1| t + &input[y1][x..x + 3].to_string());
-                    let xmas =
-                        Regex::new(r"^(?:M.M.A.S.S|M.S.A.M.S|S.M.A.S.M|S.S.A.M.M)$").unwrap();
                     xmas.is_match(&combined)
                 })
                 .count() as i64
