@@ -234,6 +234,7 @@ fn part2(input: &Vec<Vec<char>>) -> u64 {
             let mut component = Vec::new();
             dfs_component((x, y), &mut visited, &mut component, input);
             let area = component.len() as u64;
+            // Sides are calculated by counting corners (idea from Reddit)
             let sides: u64 = component
                 .iter()
                 .map(|&(x, y)| corners(x, y, width, height, input))
