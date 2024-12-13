@@ -5,4 +5,6 @@ edition = "2021"
 
 [dependencies]
 itertools = "0.13.0"
+ndarray = "0.15"
+ndarray-linalg = {version = "0.16.0", features = ["openblas-system"]}
 regex = "1.11.1"
