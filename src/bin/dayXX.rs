@@ -34,11 +34,11 @@ fn day_input() -> Vec<String> {
     process_input(read_input(DAY))
 }
 
-fn part1(input: &Vec<String>) -> i64 {
+fn part1(_input: &Vec<String>) -> i64 {
     0
 }
 
-fn part2(input: &Vec<String>) -> i64 {
+fn part2(_input: &Vec<String>) -> i64 {
     0
 }
 
