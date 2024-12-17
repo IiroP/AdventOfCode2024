@@ -11,8 +11,6 @@ pub fn main() {
 }
 
 struct InitialMap {
-    width: i64,
-    height: i64,
     instructions: Vec<char>,
     boxes: Vec<(i64, i64)>,
     walls: Vec<(i64, i64)>,
@@ -21,8 +19,6 @@ struct InitialMap {
 
 // Parse input
 fn process_input(input: Vec<String>) -> InitialMap {
-    let width = input[0].len() as i64;
-    let mut height = 0;
     let mut instructions: Vec<char> = Vec::new();
     let mut boxes: Vec<(i64, i64)> = Vec::new();
     let mut walls: Vec<(i64, i64)> = Vec::new();
@@ -33,8 +29,6 @@ fn process_input(input: Vec<String>) -> InitialMap {
             continue;
         } else if chars[0] == '#' {
             // Map
-            height += 1;
-
             chars.iter().enumerate().for_each(|(x, &c)| {
                 let x = x as i64;
                 let y = y as i64;
@@ -55,8 +49,6 @@ fn process_input(input: Vec<String>) -> InitialMap {
         }
     }
     InitialMap {
-        width,
-        height,
         instructions,
         boxes,
         walls,
@@ -164,10 +156,10 @@ fn move_robot2(
     }
     // Check boxes
     if boxes.contains(&proposed) || boxes.contains(&proposed2) {
-        let (box_l, box_r) = if boxes.contains(&proposed) {
-            (proposed, (proposed.0 + 1, proposed.1))
+        let box_l = if boxes.contains(&proposed) {
+            proposed
         } else {
-            (proposed2, proposed)
+            proposed2
         };
         let (success, new_boxes) = move_box(box_l, change, boxes, walls, 0);
         if success {
@@ -237,6 +229,7 @@ fn move_box(
     }
 }
 
+#[allow(dead_code)]
 fn draw_map(boxes: &Vec<(i64, i64)>, walls: &Vec<(i64, i64)>, robot: (i64, i64)) {
     let max_x = walls
         .iter()
