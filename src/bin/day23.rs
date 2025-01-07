@@ -1,4 +1,4 @@
-use std::{cmp::min, collections::HashSet, usize};
+use std::{collections::HashSet, usize};
 
 use aoc2024::common::read_input;
 use itertools::Itertools;
