@@ -184,6 +184,56 @@ fn possible_paths2() -> HashMap<(char, char), Vec<String>> {
     ]);
     paths
 }
+
+fn required_keypresses(
+    current: char,
+    next: char,
+    paths2: &HashMap<(char, char), Vec<String>>,
+    remaining: usize,
+    memo: &mut HashMap<(char, char, usize), u64>,
+) -> u64 {
+    // Memoization
+    //println!("{current} -> {next}, remaining: {remaining}");
+    if let Some(&res) = memo.get(&(current, next, remaining)) {
+        return res;
+    }
+    let res = if remaining == 0 {
+        let result = paths2
+            .get(&(current, next))
+            .unwrap()
+            .iter()
+            .map(|s| s.len())
+            .min()
+            .unwrap()
+            .try_into()
+            .unwrap();
+        //println!("{current} -> {next}: {result}");
+        result
+    } else {
+        let result = paths2
+            .get(&(current, next))
+            .unwrap()
+            .iter()
+            .map(|s| {
+                s.chars()
+                    .into_iter()
+                    .fold(('A', 0), |(prev, acc), c| {
+                        (
+                            c,
+                            acc + required_keypresses(prev, c, paths2, remaining - 1, memo),
+                        )
+                    })
+                    .1
+            })
+            .min()
+            .unwrap();
+        //println!("{current} -> {next}: {result}, remaining: {remaining}");
+        result
+    };
+
+    memo.insert((current, next, remaining), res);
+    res
+}
 // Parse sample input
 fn _sample_input() -> Vec<String> {
     let data = "029A
@@ -223,38 +273,50 @@ fn process_line(
     choices
 }
 
-fn part1(input: &Vec<String>) -> u64 {
+fn calculate_keypresses(input: &Vec<String>, directional_robots: usize) -> u64 {
     let paths = possible_paths();
     let paths2 = possible_paths2();
+    let mut memo = HashMap::new();
     input
         .iter()
         .map(|line| {
             let number = line.split_at(3).0.parse::<u64>().unwrap();
             let choices = process_line(line, 'A', &paths);
             //println!("Choices: {:?}", choices);
-            let len = choices
+            let len: u64 = choices
                 .iter()
                 .map(|choice| {
-                    let choices2 = process_line(choice, 'A', &paths2);
-                    //println!("Final choices: {:?}", final_choices);
-                    choices2
-                        .iter()
-                        .map(|choice2| {
-                            let final_choices = process_line(choice2, 'A', &paths2);
-                            final_choices.iter().map(|v| v.len()).min().unwrap()
+                    choice
+                        .chars()
+                        .into_iter()
+                        .fold(('A', 0), |(prev, acc), c| {
+                            (
+                                c,
+                                acc + required_keypresses(
+                                    prev,
+                                    c,
+                                    &paths2,
+                                    directional_robots - 1,
+                                    &mut memo,
+                                ),
+                            )
                         })
-                        .min()
-                        .unwrap()
+                        .1
                 })
                 .min()
                 .unwrap();
-            number * (len as u64)
+            //println!("Length: {len}");
+            number * len
         })
         .sum()
 }
 
-fn part2(_input: &Vec<String>) -> i64 {
-    0
+fn part1(input: &Vec<String>) -> u64 {
+    calculate_keypresses(input, 2)
+}
+
+fn part2(input: &Vec<String>) -> u64 {
+    calculate_keypresses(input, 25)
 }
 
 #[cfg(test)]
@@ -268,12 +330,6 @@ mod tests {
     }
 
     #[test]
-    fn test_part2() {
-        let input = _sample_input();
-        assert_eq!(0, part2(&input));
-    }
-
-    #[test]
     fn real_part1() {
         let input = day_input();
         assert_eq!(242484, part1(&input));
@@ -282,8 +338,6 @@ mod tests {
     #[test]
     fn real_part2() {
         let input = day_input();
-        assert_eq!(0, part2(&input));
+        assert_eq!(294209504640384, part2(&input));
     }
 }
-
-// 255544 too high
